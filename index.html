@@ -113,8 +113,8 @@ button:active{
 <body>
 
 <div class="container">
-  <h1>VELOCITY SOCIETY CLUB</h1>
-  <h2>VSC CLUB ATTENDANCE</h2>
+  <h1>CAR PARKING MULTIPLAYER</h1>
+  <h2>CLUB ATTENDANCE SYSTEM</h2>
 
   <label>NAME</label>
   <input id="name">
@@ -144,6 +144,10 @@ button:active{
     <h4 id="rateDisplay"></h4>
   </div>
 
+<div id="absentBox" style="margin-bottom:12px">
+  <strong>ABSENT MEMBERS:</strong>
+  <ul id="absentList" style="font-size:13px;margin-top:6px"></ul>
+</div>
   <h3>LIVE LOG</h3>
 
   <div class="log-table">
@@ -212,7 +216,7 @@ window.confirmEntry = function(){
     return alert("Name & CPM ID required");
   }
 
-  /* ✅ CHECK NAME + CPM MATCH */
+
   const validMember = members.find(
     m => m.cpm === cpm && m.name.toLowerCase() === name.toLowerCase()
   );
@@ -242,31 +246,24 @@ window.confirmEntry = function(){
 const logList = document.getElementById("logList");
 const countDisplay = document.getElementById("countDisplay");
 const rateDisplay  = document.getElementById("rateDisplay");
+const absentList = document.getElementById("absentList");
 
 onValue(ref(db,"attendance"), snap=>{
   logList.innerHTML="";
+  absentList.innerHTML="";
 
-  const data = snap.val();
-
-  
-  if(!data){
-    countDisplay.innerText = `0 / ${TOTAL_MEMBERS} Members`;
-    rateDisplay.innerText = "BAD";
-    return;
-  }
-
+  const data = snap.val() || {};
   const records = Object.values(data);
 
-  
+
   const presentCPM = new Set(
     records
       .filter(r => r.absent !== "YES")
       .map(r => r.cpm)
   );
 
+
   const presentCount = presentCPM.size;
-
-
   countDisplay.innerText = `${presentCount} / ${TOTAL_MEMBERS} Members`;
 
   
@@ -274,8 +271,16 @@ onValue(ref(db,"attendance"), snap=>{
   if(presentCount === TOTAL_MEMBERS) rate = "COMPLETE 🎉";
   else if(presentCount >= TOTAL_MEMBERS * 0.9) rate = "VERY GOOD ✅";
   else if(presentCount >= TOTAL_MEMBERS * 0.7) rate = "GOOD 👍";
-
   rateDisplay.innerText = rate;
+
+  
+  members.forEach(m=>{
+    if(!presentCPM.has(m.cpm)){
+      const li = document.createElement("li");
+      li.textContent = `${m.name} (${m.cpm})`;
+      absentList.appendChild(li);
+    }
+  });
 
 
   records.reverse().forEach(r=>{
@@ -304,4 +309,4 @@ window.resetRecords = function(){
 </script>
 
 </body>
-  </html>
+</html>
