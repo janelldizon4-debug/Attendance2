@@ -105,6 +105,35 @@ button:active{
   justify-content:center;
   align-items:center;
 }
+/* STATUS COLORS */
+#rateDisplay{
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+/* BAD */
+.status-bad{
+  color:#ff4d4d;
+}
+
+/* GOOD */
+.status-good{
+  color:#ffd24d;
+}
+
+/* VERY GOOD */
+.status-very-good{
+  color:#4da6ff;
+}
+
+/* COMPLETE */
+.status-complete{
+  color:#00ff99;
+  text-shadow:
+    0 0 6px rgba(0,255,153,.8),
+    0 0 12px rgba(0,255,153,.6),
+    0 0 20px rgba(0,255,153,.4);
+}
 .status.present::before{content:"✔";color:#00ff99}
 .status.absent::before{content:"✖";color:#ff4d4d}
 </style>
@@ -114,7 +143,7 @@ button:active{
 
 <div class="container">
   <h1>VELOCITY SOCIETY CLUB</h1>
-  <h2>VSC CLUB ATTENDANCE </h2>
+  <h2>VSC CLUB ATTENDANCE</h2>
 
   <label>NAME</label>
   <input id="name">
@@ -144,10 +173,6 @@ button:active{
     <h4 id="rateDisplay"></h4>
   </div>
 
-<div id="absentBox" style="margin-bottom:12px">
-  <strong>ABSENT MEMBERS:</strong>
-  <ul id="absentList" style="font-size:13px;margin-top:6px"></ul>
-</div>
   <h3>LIVE LOG</h3>
 
   <div class="log-table">
@@ -216,7 +241,7 @@ window.confirmEntry = function(){
     return alert("Name & CPM ID required");
   }
 
-
+  /* ✅ CHECK NAME + CPM MATCH */
   const validMember = members.find(
     m => m.cpm === cpm && m.name.toLowerCase() === name.toLowerCase()
   );
@@ -246,24 +271,35 @@ window.confirmEntry = function(){
 const logList = document.getElementById("logList");
 const countDisplay = document.getElementById("countDisplay");
 const rateDisplay  = document.getElementById("rateDisplay");
-const absentList = document.getElementById("absentList");
 
 onValue(ref(db,"attendance"), snap=>{
   logList.innerHTML="";
-  absentList.innerHTML="";
 
-  const data = snap.val() || {};
+  const data = snap.val();
+
+  
+  if(!data){
+  countDisplay.innerText = `0 / ${TOTAL_MEMBERS} Members`;
+  rateDisplay.innerText = "BAD";
+
+  rateDisplay.className = "";
+  rateDisplay.classList.add("status-bad");
+
+  return;
+}
+
   const records = Object.values(data);
 
-
+  
   const presentCPM = new Set(
     records
       .filter(r => r.absent !== "YES")
       .map(r => r.cpm)
   );
 
-
   const presentCount = presentCPM.size;
+
+
   countDisplay.innerText = `${presentCount} / ${TOTAL_MEMBERS} Members`;
 
   
@@ -271,16 +307,25 @@ onValue(ref(db,"attendance"), snap=>{
   if(presentCount === TOTAL_MEMBERS) rate = "COMPLETE 🎉";
   else if(presentCount >= TOTAL_MEMBERS * 0.9) rate = "VERY GOOD ✅";
   else if(presentCount >= TOTAL_MEMBERS * 0.7) rate = "GOOD 👍";
+
   rateDisplay.innerText = rate;
 
-  
-  members.forEach(m=>{
-    if(!presentCPM.has(m.cpm)){
-      const li = document.createElement("li");
-      li.textContent = `${m.name} (${m.cpm})`;
-      absentList.appendChild(li);
-    }
-  });
+/* 🔄 RESET OLD COLOR */
+rateDisplay.className = "";
+
+/* 🎨 APPLY STATUS COLOR */
+if(rate === "BAD"){
+  rateDisplay.classList.add("status-bad");
+}
+else if(rate === "GOOD 👍"){
+  rateDisplay.classList.add("status-good");
+}
+else if(rate === "VERY GOOD ✅"){
+  rateDisplay.classList.add("status-very-good");
+}
+else if(rate === "COMPLETE 🎉"){
+  rateDisplay.classList.add("status-complete");
+}
 
 
   records.reverse().forEach(r=>{
