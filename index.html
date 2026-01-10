@@ -14,7 +14,6 @@ body{
   background:linear-gradient(135deg, rgba(10,0,25,.9), rgba(0,10,30,.92));
   color:#eaffff;
 }
-
 .container{
   margin:14px;
   padding:22px;
@@ -22,7 +21,6 @@ body{
   background:rgba(8,8,20,.65);
   border:1px solid rgba(0,255,255,.25);
 }
-
 h1{
   text-align:center;
   font-family:"Playfair Display",serif;
@@ -34,55 +32,35 @@ h2{
   letter-spacing:4px;
   color:#9befff;
 }
-
 label{
   font-size:11px;
   letter-spacing:1px;
   color:#ff7cff;
 }
-
 input{
   width:100%;
-  box-sizing:border-box;
   padding:12px;
   margin-bottom:12px;
   border-radius:8px;
   background:#000;
   color:#eaffff;
   border:1px solid #00eaff;
-  font-size:16px;
 }
-
 button{
   width:100%;
   padding:14px;
   border-radius:28px;
-  font-family:"Playfair Display",serif;
   letter-spacing:3px;
-  border:1px solid rgba(0,255,255,.6);
   cursor:pointer;
   background:linear-gradient(120deg,#ff00cc,#00eaff,#ff00cc);
-  background-size:200% 100%;
   color:#000;
-  transition:background-position .6s ease,transform .15s ease;
 }
-
-button:hover{
-  background-position:100% 0;
-  transform:translateY(-2px);
-}
-button:active{
-  transform:scale(.97);
-}
-
 .log{margin-top:26px;}
-
 .log-table{
   max-height:300px;
   overflow-y:auto;
   border-top:1px solid rgba(0,255,255,.25);
 }
-
 .log-row{
   display:grid;
   grid-template-columns:40px 100px 80px 90px 80px 80px 140px;
@@ -91,137 +69,106 @@ button:active{
   font-size:12px;
   border-bottom:1px solid rgba(0,255,255,.15);
 }
-
 .log-head{
   font-weight:bold;
-  color:#9befff;
   position:sticky;
   top:0;
   background:#000;
 }
-
-.status{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-}
-/* STATUS COLORS */
-#rateDisplay{
-  font-weight: bold;
-  letter-spacing: 2px;
-}
-
-/* BAD */
-.status-bad{
-  color:#ff4d4d;
-}
-
-/* GOOD */
-.status-good{
-  color:#ffd24d;
-}
-
-/* VERY GOOD */
-.status-very-good{
-  color:#4da6ff;
-}
-
-/* COMPLETE */
-.status-complete{
-  color:#00ff99;
-  text-shadow:
-    0 0 6px rgba(0,255,153,.8),
-    0 0 12px rgba(0,255,153,.6),
-    0 0 20px rgba(0,255,153,.4);
-}
 .status.present::before{content:"✔";color:#00ff99}
 .status.absent::before{content:"✖";color:#ff4d4d}
+
+/* STATUS BAR */
+.status-bar{
+  width:100%;
+  height:14px;
+  background:#222;
+  border-radius:20px;
+  overflow:hidden;
+  margin:10px 0;
+}
+#progressBar{
+  height:100%;
+  width:0%;
+  transition:width .5s ease;
+}
+.bar-bad{background:#ff4d4d;}
+.bar-good{background:#ffd24d;}
+.bar-very-good{background:#4da6ff;}
+.bar-complete{
+  background:#00ff99;
+  box-shadow:0 0 8px rgba(0,255,153,.8);
+}
 </style>
 </head>
 
 <body>
 
 <div class="container">
-  <h1>VELOCITY SOCIETY CLUB</h1>
-  <h2>VSC CLUB ATTENDANCE</h2>
+<h1>VELOCITY SOCIETY CLUB</h1>
+<h2>VSC CLUB ATTENDANCE</h2>
 
-  <label>NAME</label>
-  <input id="name">
+<label>NAME</label>
+<input id="name">
 
-  <label>CPM ID</label>
-  <input id="cpm">
+<label>CPM ID</label>
+<input id="cpm">
 
-  <label>DATE</label>
-  <input id="date" readonly>
+<label>DATE</label>
+<input id="date" readonly>
 
-  <label>TIME</label>
-  <input id="time" readonly>
+<label>TIME</label>
+<input id="time" readonly>
 
-  <label>ABSENT</label>
-  <input id="absent" placeholder="YES if absent">
+<label>ABSENT</label>
+<input id="absent" placeholder="YES if absent">
 
-  <label>REASON</label>
-  <input id="reason">
+<label>REASON</label>
+<input id="reason">
 
-  <button onclick="confirmEntry()">CONFIRM</button>
+<button onclick="confirmEntry()">CONFIRM</button>
 
- <div class="log">
+<div class="log">
 
- 
-  <div style="text-align:center;margin-bottom:12px">
-    <h3 id="countDisplay">0 / 0 Members</h3>
-    <h4 id="rateDisplay"></h4>
+<div style="text-align:center">
+  <h3 id="countDisplay">0 / 0 Members</h3>
+  <h4 id="rateDisplay">BAD</h4>
+</div>
+
+<div class="status-bar">
+  <div id="progressBar"></div>
+</div>
+
+<div>
+  <strong>ABSENT MEMBERS:</strong>
+  <ul id="absentList"></ul>
+</div>
+
+<h3>LIVE LOG</h3>
+<div class="log-table">
+  <div class="log-row log-head">
+    <div></div><div>NAME</div><div>CPM</div><div>DATE</div><div>TIME</div><div>ABSENT</div><div>REASON</div>
   </div>
+  <div id="logList"></div>
+</div>
 
-  <h3>LIVE LOG</h3>
-
-  <div class="log-table">
-    <div class="log-row log-head">
-      <div></div>
-      <div>NAME</div>
-      <div>CPM</div>
-      <div>DATE</div>
-      <div>TIME</div>
-      <div>ABSENT</div>
-      <div>REASON</div>
-    </div>
-    <div id="logList"></div>
-  </div>
-
-
-  <button style="margin-top:12px" onclick="resetRecords()">RESET (ADMIN)</button>
+<button onclick="resetRecords()">RESET (ADMIN)</button>
 
 </div>
 </div>
 
-<!-- ===== FIREBASE ===== -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { 
-  getDatabase, 
-  ref, 
-  push, 
-  onValue, 
-  remove 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-
+import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 import { members, TOTAL_MEMBERS } from "./member.js";
-
 
 const firebaseConfig = {
   apiKey: "AIzaSyC2Qqjc4Z-za60nya2ANMOP6DwQQx5IoE",
-  authDomain: "attendance-f8237.firebaseapp.com",
-  databaseURL: "https://attendance-f8237-default-rtdb.firebaseio.com",
-  projectId: "attendance-f8237",
-  storageBucket: "attendance-f8237.firebasestorage.app",
-  messagingSenderId: "100172798142",
-  appId: "1:100172798142:web:28582310d09ae203b066ef"
+  databaseURL: "https://attendance-f8237-default-rtdb.firebaseio.com"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-
 
 const dateInput = document.getElementById("date");
 const timeInput = document.getElementById("time");
@@ -232,124 +179,78 @@ setInterval(()=>{
   timeInput.value = now.toTimeString().slice(0,8);
 },1000);
 
-
 window.confirmEntry = function(){
-  const name = document.getElementById("name").value.trim();
-  const cpm  = document.getElementById("cpm").value.trim();
+  const name = nameInput.value.trim();
+  const cpm = cpmInput.value.trim();
 
-  if(!name || !cpm){
-    return alert("Name & CPM ID required");
-  }
-
-  /* ✅ CHECK NAME + CPM MATCH */
-  const validMember = members.find(
-    m => m.cpm === cpm && m.name.toLowerCase() === name.toLowerCase()
-  );
-
-  if(!validMember){
-    return alert("You are NOT a member");
-  }
-
-  const absent = document.getElementById("absent").value.trim().toUpperCase() || "NO";
-  const reason = document.getElementById("reason").value;
+  const valid = members.find(m=>m.name.toLowerCase()===name.toLowerCase() && m.cpm===cpm);
+  if(!valid) return alert("You are NOT a member");
 
   push(ref(db,"attendance"),{
-    name,
-    cpm,
-    date: dateInput.value,
-    time: timeInput.value,
-    absent,
-    reason
+    name,cpm,
+    date:dateInput.value,
+    time:timeInput.value,
+    absent:absent.value.toUpperCase()||"NO",
+    reason:reason.value
   });
 
-  ["name","cpm","absent","reason"].forEach(id=>{
-    document.getElementById(id).value="";
-  });
+  nameInput.value=cpmInput.value=absent.value=reason.value="";
 };
 
-
 const logList = document.getElementById("logList");
+const absentList = document.getElementById("absentList");
 const countDisplay = document.getElementById("countDisplay");
-const rateDisplay  = document.getElementById("rateDisplay");
+const rateDisplay = document.getElementById("rateDisplay");
+const progressBar = document.getElementById("progressBar");
 
 onValue(ref(db,"attendance"), snap=>{
   logList.innerHTML="";
+  absentList.innerHTML="";
 
-  const data = snap.val();
-
-  
-  if(!data){
-  countDisplay.innerText = `0 / ${TOTAL_MEMBERS} Members`;
-  rateDisplay.innerText = "BAD";
-
-  rateDisplay.className = "";
-  rateDisplay.classList.add("status-bad");
-
-  return;
-}
-
-  const records = Object.values(data);
-
-  
-  const presentCPM = new Set(
-    records
-      .filter(r => r.absent !== "YES")
-      .map(r => r.cpm)
-  );
-
-  const presentCount = presentCPM.size;
-
+  const records = Object.values(snap.val()||{});
+  const present = new Set(records.filter(r=>r.absent!=="YES").map(r=>r.cpm));
+  const presentCount = present.size;
 
   countDisplay.innerText = `${presentCount} / ${TOTAL_MEMBERS} Members`;
 
-  
-  let rate = "BAD";
-  if(presentCount === TOTAL_MEMBERS) rate = "COMPLETE 🎉";
-  else if(presentCount >= TOTAL_MEMBERS * 0.9) rate = "VERY GOOD ✅";
-  else if(presentCount >= TOTAL_MEMBERS * 0.7) rate = "GOOD 👍";
+  let rate="BAD";
+  if(presentCount===TOTAL_MEMBERS) rate="COMPLETE 🎉";
+  else if(presentCount>=TOTAL_MEMBERS*0.9) rate="VERY GOOD";
+  else if(presentCount>=TOTAL_MEMBERS*0.7) rate="GOOD";
+  rateDisplay.innerText=rate;
 
-  rateDisplay.innerText = rate;
+  const percent = (presentCount / TOTAL_MEMBERS) * 100;
+  progressBar.style.width = percent+"%";
+  progressBar.className="";
+  progressBar.classList.add(
+    rate==="BAD"?"bar-bad":
+    rate==="GOOD"?"bar-good":
+    rate==="VERY GOOD"?"bar-very-good":"bar-complete"
+  );
 
-/* 🔄 RESET OLD COLOR */
-rateDisplay.className = "";
-
-/* 🎨 APPLY STATUS COLOR */
-if(rate === "BAD"){
-  rateDisplay.classList.add("status-bad");
-}
-else if(rate === "GOOD 👍"){
-  rateDisplay.classList.add("status-good");
-}
-else if(rate === "VERY GOOD ✅"){
-  rateDisplay.classList.add("status-very-good");
-}
-else if(rate === "COMPLETE 🎉"){
-  rateDisplay.classList.add("status-complete");
-}
-
+  members.forEach(m=>{
+    if(!present.has(m.cpm)){
+      const li=document.createElement("li");
+      li.textContent=`${m.name} (${m.cpm})`;
+      absentList.appendChild(li);
+    }
+  });
 
   records.reverse().forEach(r=>{
-    const row = document.createElement("div");
+    const row=document.createElement("div");
     row.className="log-row";
     row.innerHTML=`
       <div class="status ${r.absent==="YES"?"absent":"present"}"></div>
-      <div>${r.name}</div>
-      <div>${r.cpm}</div>
-      <div>${r.date}</div>
-      <div>${r.time}</div>
-      <div>${r.absent}</div>
-      <div>${r.reason||""}</div>`;
+      <div>${r.name}</div><div>${r.cpm}</div>
+      <div>${r.date}</div><div>${r.time}</div>
+      <div>${r.absent}</div><div>${r.reason||""}</div>`;
     logList.appendChild(row);
   });
 });
 
-
-window.resetRecords = function(){
-  const pass = prompt("Owner password:");
-  if(pass!=="cris123") return alert("Incorrect password");
-  if(confirm("Delete ALL records?")){
-    remove(ref(db,"attendance"));
-  }
+window.resetRecords=function(){
+  if(prompt("Password")!=="cris123")return;
+  remove(ref(db,"attendance"));
 };
 </script>
 
