@@ -180,20 +180,39 @@ setInterval(()=>{
 },1000);
 
 window.confirmEntry = function(){
-  const name = nameInput.value.trim();
-  const cpm = cpmInput.value.trim();
+  const name = document.getElementById("name").value.trim();
+  const cpm  = document.getElementById("cpm").value.trim();
+  const absent = document.getElementById("absent").value.trim().toUpperCase() || "NO";
+  const reason = document.getElementById("reason").value;
 
-  const valid = members.find(m=>m.name.toLowerCase()===name.toLowerCase() && m.cpm===cpm);
-  if(!valid) return alert("You are NOT a member");
+  if(!name || !cpm){
+    alert("Name & CPM ID required");
+    return;
+  }
+
+  const valid = members.find(
+    m => m.name.toLowerCase() === name.toLowerCase() && m.cpm === cpm
+  );
+
+  if(!valid){
+    alert("You are NOT a member");
+    return;
+  }
 
   push(ref(db,"attendance"),{
-    name,cpm,
-    date:dateInput.value,
-    time:timeInput.value,
-    absent:absent.value.toUpperCase()||"NO",
-    reason:reason.value
+    name,
+    cpm,
+    date: dateInput.value,
+    time: timeInput.value,
+    absent,
+    reason
   });
 
+  document.getElementById("name").value="";
+  document.getElementById("cpm").value="";
+  document.getElementById("absent").value="";
+  document.getElementById("reason").value="";
+};
   nameInput.value=cpmInput.value=absent.value=reason.value="";
 };
 
